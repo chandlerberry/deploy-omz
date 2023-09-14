@@ -1,0 +1,8 @@
+galaxy_info:
+  role_name: zsh
+  author: Chandler Berry
+  description: Configure your user terminal with Oh my Zsh and Powerlevel10k
+  license: GPLv2
+  min_ansible_version: "2.10"
+  galaxy_tags: []
+dependencies: []

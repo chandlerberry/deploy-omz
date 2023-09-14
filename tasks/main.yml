@@ -1,0 +1,53 @@
+---
+- name: Update cache and install required packages
+  ansible.builtin.package:
+    name:
+      - zsh
+      - git
+    state: present
+  become: true
+
+- name: Set zsh as default shell for {{ target_user }}
+  ansible.builtin.command: chsh -s /bin/zsh {{ target_user }}
+  become: true
+  changed_when: false
+
+- name: Run oh-my-zsh install script
+  ansible.builtin.script: scripts/omz.sh --unattended
+  args:
+    creates: /home/{{ target_user }}/.oh-my-zsh
+
+- name: Clone powerlevel10k repository
+  ansible.builtin.git:
+    repo: "https://github.com/romkatv/powerlevel10k.git"
+    dest: /home/{{ target_user }}/.oh-my-zsh/custom/themes/powerlevel10k/
+    depth: 1
+    version: master
+  become: true
+  become_user: "{{ target_user }}"
+
+- name: Clone zsh-autosuggestions repository
+  ansible.builtin.git:
+    repo: "https://github.com/zsh-users/zsh-autosuggestions.git"
+    dest: /home/{{ target_user }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions/
+    version: master
+  become: true
+  become_user: "{{ target_user }}"
+
+- name: Clone zsh-syntax-highlighting repository
+  ansible.builtin.git:
+    repo: "https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    dest: /home/{{ target_user }}/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/
+    version: master
+  become: true
+  become_user: "{{ target_user }}"
+
+- name: Copy zshrc to host
+  ansible.builtin.template:
+    src: "{{ target_user_zshrc }}"
+    dest: /home/{{ target_user }}/.zshrc
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: "0644"
+  become: true
+  become_user: "{{ target_user }}"
